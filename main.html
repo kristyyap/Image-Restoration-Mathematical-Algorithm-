@@ -1,65 +1,108 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Reverse Image Filtering</title>
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-</head>
-<body>
-    
-    <!-- Include Breadcrumb
-    <div id="breadcrumb"></div> -->
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+      rel="stylesheet" />
+  </head>
+  <body>
     <div class="breadcrumb-container">
-        <div class="breadcrumb-content">
-            <h2>Reverse Image Filtering</h2>
-            <p><span>Home</span> &bull; <span>Reverse Image Filtering</span></p>
-        </div>
-        <div class="breadcrumb-icon">
-            <img src="images/icons.png" alt="Icon">
-        </div>
-    </div>
-    
-    <div class="upload-container">
-        <label for="imageUpload" class="upload-button" id="uploadLabel">Upload Image</label>
-        <input type="file" id="imageUpload" accept="image/*" hidden>
-        <div id="preview"></div>
+      <div class="breadcrumb-content">
+        <h2>Reverse Image Filtering</h2>
+        <p><span>Home</span> &bull; <span>Reverse Image Filtering</span></p>
+      </div>
+      <div class="breadcrumb-icon">
+        <img src="images/icons.png" alt="Icon" />
+      </div>
     </div>
 
-    <button id="reverseFilterButton" class="hidden">Reverse Image Filter</button>
+    <div class="upload-container">
+      <label for="imageUpload" class="upload-button" id="uploadLabel"
+        >Upload Image</label
+      >
+      <input type="file" id="imageUpload" accept="image/*" hidden />
+      <div id="preview"></div>
+    </div>
+
+    <button id="reverseFilterButton" class="hidden">
+      Reverse Image Filter
+    </button>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            fetch("breadcrumb.html")
-                .then(response => response.text())
-                .then(html => {
-                    document.getElementById("breadcrumb").innerHTML = html;
-                });
-        });
+      const imageUpload = document.getElementById("imageUpload");
+      const preview = document.getElementById("preview");
+      const reverseFilterButton = document.getElementById(
+        "reverseFilterButton"
+      );
+      const uploadLabel = document.getElementById("uploadLabel");
 
-        const imageUpload = document.getElementById("imageUpload");
-        const preview = document.getElementById("preview");
-        const reverseFilterButton = document.getElementById("reverseFilterButton");
-        const uploadLabel = document.getElementById("uploadLabel");
+      let uploadedImageURL = null;
 
-        imageUpload.addEventListener("change", function(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.innerHTML = `<img src="${e.target.result}" alt="Uploaded Image">`;
-                    preview.style.display = "block";
-                    uploadLabel.style.display = "none";
-                    reverseFilterButton.classList.remove("hidden");
-                };
-                reader.readAsDataURL(file);
-            }
-        });
+      imageUpload.addEventListener("change", function (event) {
+        const file = event.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            uploadedImageURL = file;
+            preview.innerHTML = `<img src="${e.target.result}" alt="Uploaded Image">`;
+            preview.style.display = "block";
+            uploadLabel.style.display = "none";
+            reverseFilterButton.classList.remove("hidden");
+          };
+          reader.readAsDataURL(file);
+        }
+      });
 
-        reverseFilterButton.addEventListener("click", function() {
-            window.location.href = "filter.html";
-        });
+      reverseFilterButton.addEventListener("click", function () {
+        if (!uploadedImageURL) return;
+
+        const formData = new FormData();
+        formData.append("image", uploadedImageURL);
+
+        // fetch("http://127.0.0.1:5000/api/reverse-filter", {
+        fetch("http://localhost:5000/api/reverse-filter", {
+          method: "POST",
+          body: formData,
+        })
+          .then((res) => {
+            if (!res.ok) throw new Error("Image processing failed");
+            return res.blob();
+          })
+          //   .then((blob) => {
+          //     const url = URL.createObjectURL(blob);
+          //     preview.innerHTML = `<img src="${url}" alt="Restored Image">`;
+          //   })
+          .then((blob) => {
+            const restoredURL = URL.createObjectURL(blob);
+            const originalURL = URL.createObjectURL(uploadedImageURL);
+
+            preview.innerHTML = `
+            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+              <div>
+                <strong>Original Image:</strong><br>
+                  <img src="${originalURL}" style="max-width: 300px; border-radius: 10px;">
+              </div>
+              <div>
+                <strong>Restored Image:</strong><br>
+                <img src="${restoredURL}" id="restoredImage" style="max-width: 300px; border-radius: 10px;">
+                <br><br>
+                
+                <a href="${restoredURL}" download="restored.png">
+                  <button style="margin-top: 10px;">Download Restored Image</button>
+                </a>
+              </div>
+            </div>
+            `;
+          })
+
+          .catch((err) => {
+            alert("Error: " + err.message);
+          });
+      });
     </script>
-</body>
+  </body>
 </html>
