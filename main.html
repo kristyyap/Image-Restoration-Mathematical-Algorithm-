@@ -25,6 +25,12 @@
         >Upload Image</label
       >
       <input type="file" id="imageUpload" accept="image/*" hidden />
+      
+      <!-- Simple processing indicator -->
+      <div id="processingIndicator" style="display: none; margin-top: 20px; text-align: center;">
+        <p>Processing your image, please wait...</p>
+      </div>
+      
       <div id="preview"></div>
     </div>
 
@@ -35,10 +41,9 @@
     <script>
       const imageUpload = document.getElementById("imageUpload");
       const preview = document.getElementById("preview");
-      const reverseFilterButton = document.getElementById(
-        "reverseFilterButton"
-      );
+      const reverseFilterButton = document.getElementById("reverseFilterButton");
       const uploadLabel = document.getElementById("uploadLabel");
+      const processingIndicator = document.getElementById("processingIndicator");
 
       let uploadedImageURL = null;
 
@@ -60,23 +65,30 @@
       reverseFilterButton.addEventListener("click", function () {
         if (!uploadedImageURL) return;
 
+        // Show processing indicator
+        processingIndicator.style.display = "block";
+        reverseFilterButton.disabled = true;
+
         const formData = new FormData();
         formData.append("image", uploadedImageURL);
 
-        // fetch("http://127.0.0.1:5000/api/reverse-filter", {
-        fetch("http://localhost:5000/api/reverse-filter", {
+        fetch("http://localhost:8000/api/reverse-filter", {  // Changed port to 8000
           method: "POST",
           body: formData,
         })
-          .then((res) => {
-            if (!res.ok) throw new Error("Image processing failed");
+        .then((res) => {
+            if (!res.ok) {
+              return res.text().then(text => {
+                throw new Error(`Server error: ${text}`);
+              });
+            }
             return res.blob();
           })
-          //   .then((blob) => {
-          //     const url = URL.createObjectURL(blob);
-          //     preview.innerHTML = `<img src="${url}" alt="Restored Image">`;
-          //   })
           .then((blob) => {
+            // Hide processing indicator
+            processingIndicator.style.display = "none";
+            reverseFilterButton.disabled = false;
+            
             const restoredURL = URL.createObjectURL(blob);
             const originalURL = URL.createObjectURL(uploadedImageURL);
 
@@ -90,17 +102,18 @@
                 <strong>Restored Image:</strong><br>
                 <img src="${restoredURL}" id="restoredImage" style="max-width: 300px; border-radius: 10px;">
                 <br><br>
-                
-                <a href="${restoredURL}" download="restored.png">
-                  <button style="margin-top: 10px;">Download Restored Image</button>
-                </a>
+                <button onclick="location.reload()" style="padding: 8px 16px; cursor: pointer;">Try Another Image</button>
               </div>
             </div>
             `;
           })
-
           .catch((err) => {
-            alert("Error: " + err.message);
+            // Hide processing indicator
+            processingIndicator.style.display = "none";
+            reverseFilterButton.disabled = false;
+            
+            console.error("Error:", err);  // Log detailed error to console
+            preview.innerHTML += `<div style="color: red; margin-top: 20px;">Error: ${err.message}</div>`;
           });
       });
     </script>

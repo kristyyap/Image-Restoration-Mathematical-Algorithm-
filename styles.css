@@ -1,118 +1,118 @@
 body {
-    font-family: 'Roboto', sans-serif;
-    background-color: #E8F0FE;
-    color: #3d3d3d;
-    margin: 0;
-    padding: 0;
-    text-align: center;
+  font-family: "Roboto", sans-serif;
+  background-color: #e8f0fe;
+  color: #3d3d3d;
+  margin: 0;
+  padding: 0;
+  text-align: center;
 }
 
 /* Breadcrumb*/
 .breadcrumb-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #fff1b3;
-    padding: 20px 40px;
-    border-radius: 10px;
-    margin: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #fff1b3;
+  padding: 20px 40px;
+  border-radius: 10px;
+  margin: 20px;
 }
 
 .breadcrumb-content {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .breadcrumb-content h2 {
-    font-family: 'Inter', sans-serif;
-    font-size: 1.5rem;
-    font-weight: 600; 
-    color: #2d3748;
-    margin: 0;
+  font-family: "Inter", sans-serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0;
 }
 
 .breadcrumb-content p {
-    font-size: 0.875rem;
-    font-weight: 400;
-    color: #4a5568;
-    margin: 5px 0 0 0;
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: #4a5568;
+  margin: 5px 0 0 0;
 }
 
 .breadcrumb-icon img {
-    width: 65px;
-    height: 65px;
+  width: 65px;
+  height: 65px;
 }
 
 /* Upload Section */
 .upload-container {
-    margin-top: 50px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  margin-top: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .upload-button {
-    background-color: #3d3d3d;
-    color: #fff1b3;
-    padding: 15px 30px;
-    border-radius: 30px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    display: inline-block;
+  background-color: #3d3d3d;
+  color: #fff1b3;
+  padding: 15px 30px;
+  border-radius: 30px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  display: inline-block;
 }
 
 /* Image Preview */
 #preview {
-    display: none;
-    margin-top: 5px;
-    border: 3px solid #3d3d3d;
-    border-radius: 5px;
-    padding: 10px;
-    background-color: #3d3d3d;
-    /* display: inline-block; */
+  display: none;
+  margin-top: 5px;
+  border: 3px solid #3d3d3d;
+  border-radius: 5px;
+  padding: 10px;
+  background-color: #3d3d3d;
+  /* display: inline-block; */
 }
 
 #preview img {
-    max-width: 500px;
-    max-height: 500px;
-    border-radius: 5px;
+  max-width: 500px;
+  max-height: 500px;
+  border-radius: 5px;
 }
 
 /* Reverse Filter Button */
 #reverseFilterButton {
-    background-color: #3d3d3d;
-    color: #fff1b3;
-    margin-top: 20px;
-    padding: 15px 30px;
-    border: none;
-    border-radius: 30px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
+  background-color: #3d3d3d;
+  color: #fff1b3;
+  margin-top: 20px;
+  padding: 15px 30px;
+  border: none;
+  border-radius: 30px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
 }
 
 /* Hidden Elements */
 .hidden {
-    display: none;
+  display: none;
 }
 
 /* Filtered Page Content */
 .filtered-content {
-    padding: 20px;
+  padding: 20px;
 }
 
 .filtered-content h3 {
-    font-size: 1.2rem;
-    font-weight: 600;
-    margin: 0 0 10px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0 0 10px;
 }
 
 .filtered-content p {
-    font-size: 1rem;
-    margin: 0;
+  font-size: 1rem;
+  margin: 0;
 }
