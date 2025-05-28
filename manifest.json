@@ -1,0 +1,10 @@
+{
+  "name": "Reverse Image Filter",
+  "version": "1.0",
+  "manifest_version": 3,
+  "description": "Right-click an image to reverse filter it on the website.",
+  "permissions": ["contextMenus", "tabs", "storage", "scripting"],
+  "background": {
+    "service_worker": "background.js"
+  }
+}

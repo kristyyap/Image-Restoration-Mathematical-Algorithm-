@@ -300,3 +300,9 @@ body {
   text-align: right;
   font-weight: bold;
 }
+
+.similarity-message {
+  font-weight: bold;
+  border-radius: 8px;
+  text-align: center;
+}
