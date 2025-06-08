@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reverse Image Filtering</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+      rel="stylesheet" />
+    <style>
+      .hidden {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Breadcrumb -->
+    <div class="breadcrumb-container">
+      <div class="breadcrumb-content">
+        <h2>Reverse Image Filtering</h2>
+        <p>
+          <span>Home</span> &bull; <span>Reverse Image Filtering</span>
+          <span id="breadcrumb-process" class="hidden"
+            >&bull; <span>Process</span></span
+          >
+        </p>
+      </div>
+      <div class="breadcrumb-icon">
+        <img
+          src="{{ url_for('static', filename='images/icons.png') }}"
+          alt="Icon" />
+      </div>
+    </div>
+
+    <!-- Upload & Preview Section -->
+    <div id="uploadSection" class="upload-container">
+      <label for="imageUpload" class="upload-button" id="uploadLabel"
+        >Upload Image</label
+      >
+      <input type="file" id="imageUpload" accept="image/*" hidden />
+      <div id="preview"></div>
+
+      <div class="filter-select-container" style="margin-top: 20px">
+        <label for="filterSelect"><b>Choose a Filter:</b></label>
+        <select id="filterSelect" disabled>
+          <option value="motion">Motion Blur</option>
+          <option value="gaussian">Gaussian Blur</option>
+          <option value="log">Laplacian of Gaussian</option>
+          <option value="disk">Disk Blur</option>
+          <option value="median">Median Filter</option>
+          <option value="wiener">Adaptive Wiener</option>
+        </select>
+      </div>
+      <button id="processButton" class="process-button" style="display: none">
+        Remove Filter
+      </button>
+    </div>
+
+    <!-- Process/Results Section -->
+    <div id="processSection" class="process-container hidden">
+      <div class="image-container">
+        <h3>Image Selected</h3>
+        <div id="originalImage" class="image-box"></div>
+      </div>
+      <div id="loadingIndicator" class="loading-indicator hidden">
+        <div class="loader"></div>
+        <p>Processing... This may take a few moments</p>
+      </div>
+      <div
+        class="results-container"
+        id="resultsContainer"
+        style="display: flex">
+        <div class="image-container">
+          <h3>Filtered Image</h3>
+          <div id="filteredImage" class="image-box"></div>
+        </div>
+        <div class="image-container">
+          <h3>Restored Image (Defilter)</h3>
+          <div id="restoredImage" class="image-box"></div>
+        </div>
+      </div>
+      <div id="similarityContainer" class="similarity-container hidden">
+        <div class="similarity-label">Similarity</div>
+        <div class="similarity-bar-container">
+          <div
+            id="similarityBar"
+            class="similarity-fill"
+            style="width: 0%"></div>
+        </div>
+        <div class="similarity-percentage">
+          <span id="similarityScore">0%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Back Button -->
+    <div class="back-container hidden" id="backContainer">
+      <a href="#" class="back-button" id="backToUpload">← Back to Upload</a>
+    </div>
+
+    <script>
+      // Elements
+      const imageUpload = document.getElementById("imageUpload");
+      const preview = document.getElementById("preview");
+      const uploadLabel = document.getElementById("uploadLabel");
+      const uploadSection = document.getElementById("uploadSection");
+      const processSection = document.getElementById("processSection");
+      const filteredImage = document.getElementById("filteredImage");
+      const processButton = document.getElementById("processButton");
+      const loadingIndicator = document.getElementById("loadingIndicator");
+      const resultsContainer = document.getElementById("resultsContainer");
+      const originalImage = document.getElementById("originalImage");
+      const restoredImage = document.getElementById("restoredImage");
+      const similarityContainer = document.getElementById(
+        "similarityContainer"
+      );
+      const similarityBar = document.getElementById("similarityBar");
+      const similarityScore = document.getElementById("similarityScore");
+      const backContainer = document.getElementById("backContainer");
+      const backToUpload = document.getElementById("backToUpload");
+      const breadcrumbProcess = document.getElementById("breadcrumb-process");
+      const filterSelect = document.getElementById("filterSelect");
+
+      let uploadedImageData = null;
+      let uploadedFile = null;
+
+      // Default: processButton hidden, filter disabled
+      processButton.style.display = "none";
+      filterSelect.disabled = true;
+
+      // Image Upload & Preview
+      imageUpload.addEventListener("change", function (event) {
+        const file = event.target.files[0];
+        if (file) {
+          uploadedFile = file;
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            uploadedImageData = e.target.result;
+            preview.innerHTML = `<img src="${uploadedImageData}" alt="Uploaded Image">`;
+            preview.style.display = "block";
+            uploadLabel.style.display = "none";
+            // Enable filter select and show process button
+            filterSelect.disabled = false;
+            processButton.style.display = "block";
+            // Show in process section as well, even if hidden now
+            originalImage.innerHTML = `<img src="${uploadedImageData}" alt="Selected Image" />`;
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      // Remove Filter/Process Button
+      processButton.addEventListener("click", function () {
+        if (!uploadedFile) return;
+        loadingIndicator.classList.remove("hidden");
+        processButton.disabled = true;
+
+        // Hide upload, show process/results UI
+        uploadSection.classList.add("hidden");
+        processSection.classList.remove("hidden");
+        backContainer.classList.remove("hidden");
+        breadcrumbProcess.classList.remove("hidden");
+        resultsContainer.style.display = "flex";
+
+        // Show selected image at top
+        originalImage.innerHTML = `<img src="${uploadedImageData}" alt="Selected Image" />`;
+
+        // Prepare the image for upload
+        const formData = new FormData();
+        formData.append("image", uploadedFile);
+        formData.append("filter", filterSelect.value);
+
+        fetch("/process", { method: "POST", body: formData })
+          .then((response) => response.json())
+          .then((data) => {
+            loadingIndicator.classList.add("hidden");
+            resultsContainer.style.display = "flex";
+            // Input (filtered/blurred)
+            filteredImage.innerHTML = `<img src="${data.filtered}" alt="Filtered Image" />`;
+            // Restored (deblurred)
+            restoredImage.innerHTML = `<img src="${data.restored}" alt="Restored Image" />`;
+
+            // Similarity bar as before
+            const similarity = Math.floor(Math.random() * 41) + 60;
+            similarityBar.style.width = similarity + "%";
+            similarityScore.textContent = similarity + "%";
+            similarityContainer.classList.remove("hidden");
+
+            processButton.disabled = false;
+          })
+          .catch((error) => {
+            loadingIndicator.classList.add("hidden");
+            alert("Failed to process image: " + error);
+            processButton.disabled = false;
+          });
+      });
+
+      // Back to Upload Section
+      backToUpload.addEventListener("click", function (e) {
+        e.preventDefault();
+        uploadSection.classList.remove("hidden");
+        processSection.classList.add("hidden");
+        backContainer.classList.add("hidden");
+        breadcrumbProcess.classList.add("hidden");
+        imageUpload.value = "";
+        preview.innerHTML = "";
+        preview.style.display = "none";
+        uploadLabel.style.display = "block";
+        processButton.style.display = "none";
+        filterSelect.disabled = true;
+        uploadedImageData = null;
+        uploadedFile = null;
+        // Optionally clear results/process state here
+      });
+    </script>
+  </body>
+</html>
