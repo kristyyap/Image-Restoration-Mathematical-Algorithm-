@@ -43,7 +43,10 @@
       <input type="file" id="imageUpload" accept="image/*" hidden />
       <div id="preview"></div>
 
-      <div class="filter-select-container" style="margin-top: 20px">
+      <div
+        class="filter-select-container hidden"
+        id="filterSelectContainer"
+        style="margin-top: 20px">
         <label for="filterSelect"><b>Choose a Filter:</b></label>
         <select id="filterSelect" disabled>
           <option value="motion">Motion Blur</option>
@@ -74,7 +77,7 @@
         id="resultsContainer"
         style="display: flex">
         <div class="image-container">
-          <h3>Filtered Image</h3>
+          <h3>Filtered Image (<span id="chosenFilterLabel"></span>)</h3>
           <div id="filteredImage" class="image-box"></div>
         </div>
         <div class="image-container">
@@ -82,17 +85,14 @@
           <div id="restoredImage" class="image-box"></div>
         </div>
       </div>
-      <div id="similarityContainer" class="similarity-container hidden">
-        <div class="similarity-label">Similarity</div>
+      <div class="similarity-row">
+        <span class="similarity-label">Similarity : </span>
+
         <div class="similarity-bar-container">
-          <div
-            id="similarityBar"
-            class="similarity-fill"
-            style="width: 0%"></div>
+          <div id="similarityBar" class="similarity-fill"></div>
         </div>
-        <div class="similarity-percentage">
-          <span id="similarityScore">0%</span>
-        </div>
+
+        <span id="similarityScore" class="similarity-percentage" >0%</span>
       </div>
     </div>
 
@@ -114,15 +114,24 @@
       const resultsContainer = document.getElementById("resultsContainer");
       const originalImage = document.getElementById("originalImage");
       const restoredImage = document.getElementById("restoredImage");
-      const similarityContainer = document.getElementById(
-        "similarityContainer"
-      );
       const similarityBar = document.getElementById("similarityBar");
       const similarityScore = document.getElementById("similarityScore");
       const backContainer = document.getElementById("backContainer");
       const backToUpload = document.getElementById("backToUpload");
       const breadcrumbProcess = document.getElementById("breadcrumb-process");
       const filterSelect = document.getElementById("filterSelect");
+      const filterSelectContainer = document.getElementById(
+        "filterSelectContainer"
+      );
+      const chosenFilterLabel = document.getElementById("chosenFilterLabel");
+      const filterDisplayNames = {
+        motion: "Motion Blur",
+        gaussian: "Gaussian Blur",
+        log: "Laplacian of Gaussian",
+        disk: "Disk Blur",
+        median: "Median Filter",
+        wiener: "Adaptive Wiener",
+      };
 
       let uploadedImageData = null;
       let uploadedFile = null;
@@ -142,7 +151,7 @@
             preview.innerHTML = `<img src="${uploadedImageData}" alt="Uploaded Image">`;
             preview.style.display = "block";
             uploadLabel.style.display = "none";
-            // Enable filter select and show process button
+            filterSelectContainer.classList.remove("hidden");
             filterSelect.disabled = false;
             processButton.style.display = "block";
             // Show in process section as well, even if hidden now
@@ -157,6 +166,10 @@
         if (!uploadedFile) return;
         loadingIndicator.classList.remove("hidden");
         processButton.disabled = true;
+
+        const chosenFilter = filterSelect.value;
+        chosenFilterLabel.textContent =
+          filterDisplayNames[chosenFilter] || chosenFilter;
 
         // Hide upload, show process/results UI
         uploadSection.classList.add("hidden");
@@ -184,10 +197,14 @@
             restoredImage.innerHTML = `<img src="${data.restored}" alt="Restored Image" />`;
 
             // Similarity bar as before
-            const similarity = Math.floor(Math.random() * 41) + 60;
+            const similarity = data.similarity; // e.g., 99
             similarityBar.style.width = similarity + "%";
             similarityScore.textContent = similarity + "%";
-            similarityContainer.classList.remove("hidden");
+            // Optionally color the bar based on value:
+            similarityBar.classList.remove("high", "medium", "low");
+            if (similarity >= 75) similarityBar.classList.add("high");
+            else if (similarity >= 35) similarityBar.classList.add("medium");
+            else similarityBar.classList.add("low");
 
             processButton.disabled = false;
           })
@@ -211,6 +228,7 @@
         uploadLabel.style.display = "block";
         processButton.style.display = "none";
         filterSelect.disabled = true;
+        filterSelectContainer.classList.add("hidden");
         uploadedImageData = null;
         uploadedFile = null;
         // Optionally clear results/process state here

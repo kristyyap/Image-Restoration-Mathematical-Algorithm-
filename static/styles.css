@@ -7,7 +7,9 @@ body {
   text-align: center;
 }
 
-.hidden { display: none !important; }
+.hidden {
+  display: none !important;
+}
 
 /* Breadcrumb*/
 .breadcrumb-container {
@@ -258,47 +260,100 @@ body {
 }
 
 /* Similarity */
-.similarity-container {
-  margin-top: 20px;
-  padding: 15px;
-  background-color: #f5f5f5;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.similarity-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin: 16px 0 0 0;
+  width: 450px;
+  gap: 12px;
 }
 
 .similarity-label {
-  font-weight: bold;
-  margin-bottom: 8px;
+  font-weight: 700;
+  font-size: 1.12rem;
+  min-width: 108px; 
+  text-align: right;
 }
 
 .similarity-bar-container {
-  height: 20px;
-  background-color: #e0e0e0;
-  border-radius: 10px;
+  flex: 1 1 180px;
+  display: flex;
+  align-items: center;
+  border: 1px solid #848484;
+  height: 18px;
+  width: 100%;
+  background-color: #e4e4e4;
+  border-radius: 12px;
   overflow: hidden;
-  margin-bottom: 5px;
+  margin-left: 8px;
+  margin-right: 8px;
 }
 
 .similarity-fill {
   height: 100%;
-  transition: width 0.8s ease-in-out;
-  border-radius: 10px;
+  background-color: #dadada; /* or #4caf50 for green if you want */
+  border-radius: 12px;
+  transition: width 0.8s cubic-bezier(0.4, 1.6, 0.6, 1);
+  width: 0%;
 }
 
-/* Color coding for similarity levels */
+/* Percentage styling already handled above. If you want to color-code: */
 .similarity-fill.high {
-  background-color: #4caf50; /* Green for high similarity */
+  background-color: #4caf50;
 }
-
 .similarity-fill.medium {
-  background-color: #ffc107; /* Amber for medium similarity */
+  background-color: #ffc107;
 }
-
 .similarity-fill.low {
-  background-color: #f44336; /* Red for low similarity */
+  background-color: #f44336;
 }
 
 .similarity-percentage {
-  text-align: right;
-  font-weight: bold;
+  font-weight: 700;
+  font-size: 1.12rem;
+  min-width: 38px;
+  text-align: left;
+}
+
+/* filter select */
+.filter-select-container label {
+  margin-right: 10px;
+  font-size: 1rem;
+  color: #333;
+}
+
+#filterSelect {
+  padding: 8px 40px 8px 18px;
+  border: 1.5px solid #ddd;
+  border-radius: 8px;
+  background: #f9f9fc;
+  color: #222;
+  font-size: 1rem;
+  outline: none;
+  transition: border 0.2s, box-shadow 0.2s;
+  margin-left: 6px;
+  margin-top: 4px;
+  min-width: 180px;
+  box-shadow: 0 1px 2px rgba(60, 70, 100, 0.04);
+  background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="16" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 18px 18px;
+  appearance: none; /* Remove native arrow on Chrome/Safari */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+#filterSelect:focus,
+#filterSelect:hover {
+  border: 1.5px solid #4a90e2;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(74, 144, 226, 0.1);
+}
+
+#filterSelect option {
+  background: #fff;
+  color: #222;
+  font-size: 1rem;
 }
