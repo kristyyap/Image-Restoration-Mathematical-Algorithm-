@@ -4,8 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Reverse Image Filtering</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+      rel="stylesheet" />
   </head>
   <body>
     <!-- Breadcrumb -->
@@ -14,35 +18,52 @@
         <h2>Reverse Image Filtering</h2>
         <p>
           <span>Home</span> &bull; <span>Reverse Image Filtering</span>
-          <span id="breadcrumb-process" class="hidden">&bull; <span>Process</span></span>
+          <span id="breadcrumb-process" class="hidden"
+            >&bull; <span>Process</span></span
+          >
         </p>
       </div>
       <div class="breadcrumb-icon">
-        <img src="{{ url_for('static', filename='images/icons.png') }}" alt="Icon" />
+        <img
+          src="{{ url_for('static', filename='images/icons.png') }}"
+          alt="Icon" />
       </div>
     </div>
 
     <!-- Upload & Preview Section -->
     <div id="uploadSection" class="upload-container">
       <div>
-        <label for="originalUpload" class="upload-button" id="originalUploadLabel">Upload <b>Original</b> Image</label>
+        <label
+          for="originalUpload"
+          class="upload-button"
+          id="originalUploadLabel"
+          >Upload <b>Original</b> Image</label
+        >
         <input type="file" id="originalUpload" accept="image/*" hidden />
         <span id="originalPreview"></span>
       </div>
-      <div style="margin-top:16px;">
-        <label for="filteredUpload" class="upload-button" id="filteredUploadLabel">Upload <b>Filtered</b> Image</label>
+      <div style="margin-top: 16px">
+        <label
+          for="filteredUpload"
+          class="upload-button"
+          id="filteredUploadLabel"
+          >Upload <b>Filtered</b> Image</label
+        >
         <input type="file" id="filteredUpload" accept="image/*" hidden />
         <span id="filteredPreview"></span>
       </div>
 
-      <button id="processButton" class="process-button" style="display: none; margin-top:24px;">
+      <button
+        id="processButton"
+        class="process-button"
+        style="display: none; margin-top: 24px">
         Remove Filter
       </button>
     </div>
 
     <!-- Process/Results Section -->
     <div id="processSection" class="process-container hidden">
-      <div style="display: flex; gap: 20px; justify-content: flex-start;">
+      <div style="display: flex; gap: 20px; justify-content: flex-start">
         <div class="image-container">
           <h3>Original Image</h3>
           <div id="originalImage" class="image-box"></div>
@@ -56,10 +77,12 @@
           <div id="restoredImage" class="image-box"></div>
         </div>
       </div>
-      <div class="similarity-row" style="margin-top:24px;">
+      <div class="similarity-row" style="margin-top: 24px">
         <span class="similarity-label">Similarity : </span>
-        <div class="similarity-bar-container"><div id="similarityBar" class="similarity-fill"></div></div>
-        <span id="similarityScore" class="similarity-percentage" >0%</span>
+        <div class="similarity-bar-container">
+          <div id="similarityBar" class="similarity-fill"></div>
+        </div>
+        <span id="similarityScore" class="similarity-percentage">0%</span>
       </div>
       <div id="loadingIndicator" class="loading-indicator hidden">
         <div class="loader"></div>
@@ -91,8 +114,26 @@
       const breadcrumbProcess = document.getElementById("breadcrumb-process");
       const loadingIndicator = document.getElementById("loadingIndicator");
 
-      let originalFile = null, filteredFile = null;
-      let originalImageData = null, filteredImageData = null;
+      let originalFile = null,
+        filteredFile = null;
+      let originalImageData = null,
+        filteredImageData = null;
+
+      window.addEventListener("DOMContentLoaded", function () {
+        // 检查URL参数
+        const params = new URLSearchParams(window.location.search);
+        const filteredUrl = params.get("filtered");
+        if (filteredUrl) {
+          // 自动填充Filtered区域，并禁用上传按钮
+          filteredImageData = decodeURIComponent(filteredUrl);
+          filteredImage.innerHTML = `<img src="${filteredImageData}" alt="Filtered Image" />`;
+          filteredPreview.innerHTML = `<img src="${filteredImageData}" alt="Filtered Image" class="upload-preview-img">`;
+          // 隐藏Filtered Upload按钮
+          document.getElementById("filteredUploadLabel").style.display = "none";
+          document.getElementById("filteredUpload").style.display = "none";
+          enableProcessBtn();
+        }
+      });
 
       // Upload preview for both
       originalUpload.addEventListener("change", function (event) {
@@ -134,7 +175,7 @@
 
       // Main process button
       processButton.addEventListener("click", function () {
-        if (!originalFile || !filteredFile) return;
+        if (!originalFile || (!filteredFile && !filteredImageData)) return;
         loadingIndicator.classList.remove("hidden");
         processButton.disabled = true;
 
@@ -151,7 +192,15 @@
         // Prepare the image for upload
         const formData = new FormData();
         formData.append("original", originalFile);
-        formData.append("filtered", filteredFile);
+        if (
+          !filteredFile &&
+          filteredImageData &&
+          filteredImageData.startsWith("http")
+        ) {
+          formData.append("filtered_url", filteredImageData);
+        } else if (filteredFile) {
+          formData.append("filtered", filteredFile);
+        }
 
         fetch("/process", { method: "POST", body: formData })
           .then((response) => response.json())

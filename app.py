@@ -6,6 +6,7 @@ import io
 import base64
 from skimage.metrics import structural_similarity as ssim, peak_signal_noise_ratio as psnr
 import os
+import requests
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 eng = matlab.engine.start_matlab()
@@ -37,14 +38,25 @@ def home():
 def process():
     # Accept both files
     original_file = request.files['original']
-    filtered_file = request.files['filtered']
+    filtered_file = request.files.get('filtered')
+    filtered_url = request.form.get('filtered_url')
 
     # Save uploaded files
     original_path = 'uploads/original.png'
     filtered_path = 'uploads/filtered.png'
     os.makedirs('uploads', exist_ok=True)
     original_file.save(original_path)
-    filtered_file.save(filtered_path)
+    # filtered_file.save(filtered_path)
+
+    if filtered_file:
+        filtered_file.save(filtered_path)
+    elif filtered_url:
+        # 下载图片
+        r = requests.get(filtered_url)
+        with open(filtered_path, 'wb') as f:
+            f.write(r.content)
+    else:
+        return jsonify({'error': 'No filtered image'}), 400
 
     # Read images as numpy arrays (for SSIM later)
     original_img = np.array(Image.open(original_path).convert("RGB"))
