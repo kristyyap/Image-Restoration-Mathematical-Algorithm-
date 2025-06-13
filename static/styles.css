@@ -272,7 +272,7 @@ body {
 .similarity-label {
   font-weight: 700;
   font-size: 1.12rem;
-  min-width: 108px; 
+  min-width: 108px;
   text-align: right;
 }
 
@@ -356,4 +356,11 @@ body {
   background: #fff;
   color: #222;
   font-size: 1rem;
+}
+
+.upload-preview-img {
+  max-width: 180px;
+  margin-right: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
 }
