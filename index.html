@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reverse Image Filtering</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+      rel="stylesheet" />
+  </head>
+  <body>
+    <!-- Breadcrumb -->
+    <div class="breadcrumb-container">
+      <div class="breadcrumb-content">
+        <h2>Reverse Image Filtering</h2>
+        <p>
+          <span>Extension</span> &bull; <span>Reverse Image Filtering</span>
+          <span id="breadcrumb-process" class="hidden"
+            >&bull; <span>Process</span></span
+          >
+        </p>
+      </div>
+      <div class="breadcrumb-icon">
+        <img src="icons.png" alt="Icon" />
+      </div>
+    </div>
+
+    <!-- Upload & Preview Section -->
+    <div id="uploadSection" class="upload-container">
+      <!-- Filtered Image (Auto-filled from context menu) -->
+      <div style="margin-bottom: 20px;  text-align: center">
+        <div style="display: block; margin-bottom: 8px">
+          <span style="font-weight: bold; font-size: 1.4em; font-weight: 500; color: #3d3d3d">Filtered Image:</span>
+          <span id="filteredStatus">No image selected (Right-click an image and select "Reverse Image Filter")</span>
+        </div>
+        <div id="filteredPreview">
+          <!-- <span style="color: #999"
+            >Right-click an image and select "Reverse Image Filter"</span
+          > -->
+        </div>
+      </div>
+
+      <!-- Original Image Upload -->
+      <div>
+        <label
+          for="originalUpload"
+          class="upload-button"
+          id="originalUploadLabel"
+          >Upload <b>Original</b> Image</label
+        >
+        <input type="file" id="originalUpload" accept="image/*" hidden />
+        <div id="originalPreview" style="margin-top: 8px"></div>
+      </div>
+
+      <button id="processButton" class="process-button">Remove Filter</button>
+    </div>
+
+    <!-- Process/Results Section -->
+    <div id="processSection" class="process-container hidden">
+      <div style="display: flex; flex-direction: column; gap: 15px">
+        <div class="image-container">
+          <h3 style="font-size: 1rem">Original Image</h3>
+          <div
+            id="originalImage"
+            class="image-box"
+            style="min-height: 120px"></div>
+        </div>
+        <div class="image-container">
+          <h3 style="font-size: 1rem">Filtered Image</h3>
+          <div
+            id="filteredImage"
+            class="image-box"
+            style="min-height: 120px"></div>
+        </div>
+        <div class="image-container">
+          <h3 style="font-size: 1rem">Restored Image (Defilter)</h3>
+          <div
+            id="restoredImage"
+            class="image-box"
+            style="min-height: 120px"></div>
+        </div>
+      </div>
+
+      <div class="similarity-row" style="margin-top: 20px; width: 100%">
+        <span class="similarity-label" style="font-size: 1rem"
+          >Similarity:</span
+        >
+        <div class="similarity-bar-container">
+          <div id="similarityBar" class="similarity-fill"></div>
+        </div>
+        <span
+          id="similarityScore"
+          class="similarity-percentage"
+          style="font-size: 1rem"
+          >0%</span
+        >
+      </div>
+
+      <div id="loadingIndicator" class="loading-indicator hidden">
+        <div class="loader"></div>
+        <p>Processing... This may take a few moments</p>
+      </div>
+    </div>
+
+    <!-- Back Button -->
+    <div class="back-container hidden" id="backContainer">
+      <a
+        href="#"
+        class="back-button"
+        id="backToUpload"
+        style="font-size: 14px; padding: 10px 16px"
+        >← Back to Upload</a
+      >
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

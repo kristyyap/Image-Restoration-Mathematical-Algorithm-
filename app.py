@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify
+from flask_cors import CORS
 import matlab.engine
 import numpy as np
 from PIL import Image
@@ -9,6 +10,7 @@ import os
 import requests
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
+CORS(app)  # Enable CORS for Chrome extension
 eng = matlab.engine.start_matlab()
 
 def matlab_array_to_npimg(matlab_array):
@@ -46,13 +48,15 @@ def process():
     filtered_path = 'uploads/filtered.png'
     os.makedirs('uploads', exist_ok=True)
     original_file.save(original_path)
-    # filtered_file.save(filtered_path)
 
     if filtered_file:
         filtered_file.save(filtered_path)
     elif filtered_url:
-        # 下载图片
-        r = requests.get(filtered_url)
+        # Download image with headers to avoid blocking
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+        }
+        r = requests.get(filtered_url, headers=headers)
         with open(filtered_path, 'wb') as f:
             f.write(r.content)
     else:
@@ -60,11 +64,8 @@ def process():
 
     # Read images as numpy arrays (for SSIM later)
     original_img = np.array(Image.open(original_path).convert("RGB"))
-    # filtered_img = np.array(Image.open(filtered_path).convert("RGB"))
 
-    # Call MATLAB function (update your .m file to accept two file paths)
-    # e.g., [restored_img] = reverse_filter('original.png', 'filtered.png')
-    # Output: restored_img as MATLAB array
+    # Call MATLAB function
     restored_img = eng.reverse_filter(original_path, filtered_path, nargout=1)
 
     # Convert MATLAB output to numpy image
@@ -87,7 +88,6 @@ def process():
     print(f"Developer Log: PSNR between original and restored = {psnr_value:.2f} dB")
 
     # Convert all images to base64 for frontend display
-    # Optionally: send both uploaded images back, for clarity in UI
     def imgfile_to_b64(path):
         with open(path, "rb") as f:
             return base64.b64encode(f.read()).decode('utf-8')

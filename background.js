@@ -1,17 +1,32 @@
+// Create context menu when extension is installed
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
-    id: "reverse-image-filter",
+    id: "reverseImageFilter",
     title: "Reverse Image Filter",
-    contexts: ["image"],
+    contexts: ["image"]
   });
 });
 
+// Handle context menu clicks
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  if (info.menuItemId === "reverse-image-filter" && info.srcUrl) {
-    // 替换为你 Web 系统的实际 URL
-    const targetUrl = `http://localhost:5000/?filtered=${encodeURIComponent(
-      info.srcUrl
-    )}`;
-    chrome.tabs.create({ url: targetUrl });
+  if (info.menuItemId === "reverseImageFilter") {
+    // Store the image URL
+    chrome.storage.local.set({
+      filteredImageUrl: info.srcUrl,
+      fromContextMenu: true
+    });
+    
+    // Open in a new tab instead of popup
+    chrome.tabs.create({
+      url: chrome.runtime.getURL('index.html')
+    });
   }
+});
+
+// Handle extension icon clicks
+chrome.action.onClicked.addListener((tab) => {
+  // Open in a new tab when extension icon is clicked
+  chrome.tabs.create({
+    url: chrome.runtime.getURL('index.html')
+  });
 });

@@ -2,10 +2,23 @@
   "manifest_version": 3,
   "name": "Reverse Image Filter",
   "version": "1.0",
-  "description": "Send image to Reverse Filter System",
-  "permissions": ["contextMenus", "activeTab", "scripting"],
-  "host_permissions": ["<all_urls>"],
+  "description": "Remove filters from images by comparing with original",
+  "permissions": [
+    "contextMenus",
+    "activeTab",
+    "storage",
+    "tabs"
+  ],
   "background": {
     "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ],
+  "action": {
+    "default_title": "Reverse Image Filter"
   }
 }
