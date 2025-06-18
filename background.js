@@ -2,7 +2,7 @@
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: "reverseImageFilter",
-    title: "Reverse Image Filter",
+    title: "Remove Image Filter",
     contexts: ["image"]
   });
 });
