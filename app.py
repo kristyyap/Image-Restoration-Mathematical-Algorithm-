@@ -81,6 +81,7 @@ def process():
 
     # Calculate SSIM
     similarity, _ = ssim(original_gray, restored_gray, full=True, win_size=11, data_range=255)
+    print(f"Developer Log: SSIM between original and restored = {similarity}")
     similarity_percent = int(similarity * 100)
 
     # Calculate PSNR
